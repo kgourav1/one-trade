@@ -1,0 +1,664 @@
+# MASTER PROMPT: BUILD MY ONE TRADE — INTRADAY TRADING JOURNAL & CONSISTENCY TRACKER
+
+Act as a senior frontend engineer, product designer, UX specialist, and JavaScript developer. Build a complete, working, mobile-first web application named **One Trade**.
+
+The application is for a retail trader in India who follows Nifty 50 stocks, uses AI tools for daily market research, manually places orders through a broker app, and wants to measure trading consistency over months.
+
+Do not create just a design or prototype. Build the actual working application with functional forms, calculations, persistent storage, clipboard actions, trade history, data export, import, and analytics.
+
+If your platform supports direct project generation, create all required files in the project. If it supports only single-file generation, deliver a complete standalone HTML file with embedded CSS and JavaScript.
+
+Do not stop at a plan. Implement the application, test its functionality, and explain how to run it.
+
+---
+
+## 1. PRODUCT OBJECTIVE
+
+Build a simple personal trading companion that helps me:
+
+1. Prepare for my daily trading session.
+2. Copy a carefully designed AI prompt with one tap.
+3. Keep my trading playbook available and copyable.
+4. Calculate entry, stop-loss, target, quantity, capital deployment, and risk/reward.
+5. Manually record the trade I actually take.
+6. Record actual entry and exit times and prices.
+7. Calculate actual gross and net P&L.
+8. Track whether I followed my rules.
+9. Measure consistency and performance over a month or longer.
+10. Export all records to CSV for Excel or Google Sheets analysis.
+11. Back up and restore the entire journal.
+12. Use the website comfortably from both a phone and desktop.
+
+The tool must support manual workflows. I will obtain trade ideas from an AI assistant, verify the live market in my broker app, and place orders myself.
+
+**Important:** This is a trading journal and calculator, not a broker, financial adviser, live market terminal, or automated trading bot.
+
+Do not invent or display fake live stock prices.
+
+## 2. MY DEFAULT TRADING CONFIGURATION
+
+Create editable settings with these initial values:
+
+- Country: India
+- Timezone: Asia/Kolkata
+- Market: NSE
+- Stock universe: Nifty 50
+- Starting/reference capital: ₹50,000
+- Maximum planned risk per trade: ₹250
+- Maximum new trades per day: 1
+- Preferred instrument: NSE cash-equity intraday
+- Leverage and F&O: disabled by default
+- Minimum planned reward-to-risk: 2:1 after estimated costs
+- Preferred entry strategy: opening-range breakout/breakdown with confirmation
+- Opening range: 9:15 AM–9:30 AM IST
+- Confirmation chart interval: 5 minutes
+
+All amounts must be editable in Settings.
+
+The app must never imply that a planned risk limit guarantees the actual maximum loss. Gaps and slippage can increase losses.
+
+Allow me to change the risk budget independently of capital.
+
+## 3. VISUAL DESIGN AND UX
+
+Create a polished, professional trading dashboard.
+
+Design direction:
+- Modern, minimal, premium fintech aesthetic.
+- Dark theme by default.
+- Deep navy/charcoal backgrounds.
+- Clear contrast and readable typography.
+- Restrained use of green for positive values and red for negative values.
+- Rounded cards, subtle borders, clean tables, and consistent spacing.
+- No excessive gradients, decorative charts, or unnecessary animation.
+- Responsive layout for mobile, tablet, and desktop.
+- Large touch-friendly buttons for phone users.
+- Accessible labels, keyboard navigation, and visible focus states.
+- Format currency using Indian rupee notation and Indian number formatting.
+
+On mobile, use compact cards for key metrics and allow tables to scroll horizontally where necessary.
+
+Navigation should be simple, with these main sections:
+
+1. Dashboard
+2. Trade Calculator
+3. Journal
+4. AI Prompt
+5. Playbook
+6. Analytics
+7. Export & Settings
+
+Make every visible button functional. Do not leave placeholder buttons or non-working interactions.
+
+## 4. DASHBOARD
+
+Build a dashboard displaying:
+
+- Total recorded trades
+- Closed trades
+- Open trades
+- Net realized P&L
+- Win rate
+- Average winning trade
+- Average losing trade
+- Profit factor
+- Average net expectancy per closed trade
+- Maximum drawdown based on chronological realized P&L
+- Rule-following percentage
+- Number of no-trade days
+- Current month's net P&L
+- Current month's number of trades
+
+Use actual journal data for all metrics.
+
+Display a recent-trades table with:
+- Date
+- Stock symbol
+- Direction
+- Status
+- Quantity
+- Net P&L
+- Rule adherence
+
+Allow clicking a trade to open its details.
+
+If there is no data, show a helpful empty state instead of fake metrics.
+
+Add a clear "Plan a Trade" button and an easy way to record a no-trade day.
+
+## 5. TRADE CALCULATOR
+
+Build a working calculator with these inputs:
+
+- Trade date
+- Stock name
+- NSE symbol
+- Direction: BUY/LONG or SELL/SHORT
+- Setup status
+- Available capital
+- Risk budget
+- Planned entry price
+- Stop-loss price
+- Target price
+- Estimated total charges and slippage
+- Entry trigger description
+- Technical reasoning
+- Market and sector context
+- News/catalyst notes
+- Invalidation condition
+- Source and timestamp of the quoted price
+
+Default capital: ₹50,000.
+
+Default risk budget: ₹250.
+
+### Position-sizing calculations
+
+For a long trade:
+
+Risk per share = Entry − Stop-loss.
+
+Reward per share = Target − Entry.
+
+For a short trade:
+
+Risk per share = Stop-loss − Entry.
+
+Reward per share = Entry − Target.
+
+Quantity by risk = FLOOR(Risk budget / Risk per share).
+
+Quantity by capital = FLOOR(Available capital / Entry price).
+
+Final quantity = MIN(Quantity by risk, Quantity by capital), provided the values are valid and the instrument's execution requirements are satisfied.
+
+Capital deployed = Final quantity × Entry price.
+
+Cash remaining = Available capital − Capital deployed.
+
+Planned gross loss = Final quantity × Risk per share.
+
+Planned gross target profit = Final quantity × Reward per share.
+
+Estimated net target profit = Planned gross target profit − estimated costs.
+
+For a conservative estimated net reward-to-risk ratio, if the costs input represents the total estimated round-trip cost:
+
+Estimated net risk = Planned gross loss + estimated costs.
+
+Estimated net reward-to-risk = Estimated net target profit / Estimated net risk.
+
+Clearly label these calculations as estimates.
+
+If costs cannot be reliably estimated, mark them as unverified. Do not imply that gross reward-to-risk is the same as net reward-to-risk.
+
+### Validation rules
+
+For a long trade, require:
+
+Stop-loss < Entry < Target.
+
+For a short trade, require:
+
+Target < Entry < Stop-loss.
+
+Reject zero or negative prices, invalid quantities, negative costs, and invalid capital or risk values.
+
+If the quantity is zero, show "Do not trade — position size is zero."
+
+Warn if the estimated net reward-to-risk is below 2:1.
+
+Warn if the planned risk exceeds the configured risk budget.
+
+Never automatically modify a logical stop-loss to increase the position size.
+
+Display the calculations clearly and update them when the user changes inputs.
+
+Include buttons:
+- Calculate Position
+- Copy Trade Plan
+- Save Plan to Journal
+- Clear Form
+
+Copy Trade Plan must copy a readable, plain-text summary to the clipboard.
+
+## 6. AI PROMPT GENERATOR
+
+Create a dedicated page that contains a fully editable, reusable daily AI prompt.
+
+Include a one-tap "Copy Prompt" button with visible success/failure feedback.
+
+The prompt must use the current settings for capital, risk budget, maximum trades, preferred instrument, and minimum reward-to-risk. Do not hardcode these values in multiple places.
+
+Use this default prompt template:
+
+"Run my Daily Nifty 50 One-Trade Playbook for today's NSE trading session.
+
+My capital is ₹[CAPITAL]. My maximum planned risk is ₹[RISK] before charges and slippage. I want at most ONE new intraday trade per day. My default instrument is NSE cash-equity intraday without leverage or F&O. My minimum planned reward-to-risk is [RR] after reasonable estimated costs.
+
+Research the latest verifiable market data, current Nifty 50 constituents, NSE market calendar, relevant company news, and sector trends.
+
+Recommend at most ONE best conditional trade setup. Include the stock and NSE symbol, direction, exact entry trigger, entry reference, stop-loss, target, risk per share, reward per share, reward-to-risk ratio, quantity by risk and capital, capital deployed, cash remaining, planned gross loss, expected gross profit, estimated charges, and invalidation conditions.
+
+Timestamp prices and distinguish live, delayed, historical, and user-provided data. Cite sources. Never invent prices, indicators, Z-scores, volume, news, or trading signals.
+
+At 8:45 AM IST, provide a conditional plan only. Today's opening range and regular-session VWAP are not yet available. Reassess the setup after the market opens using current prices and completed candles before treating the setup as actionable.
+
+Require a logical stop-loss, appropriate market and sector context, VWAP and volume confirmation where available, and sufficient room for at least the required reward-to-risk ratio after reasonable estimated costs.
+
+Do not chase a move. If current data is unverified, a mandatory condition fails, or no valid setup exists, say NO TRADE. Return at most one candidate. Do not provide alternatives or force a trade.
+
+Be conservative, concise, and consistent. Finish with one instruction: wait for the trigger, enter only after confirmation, or no trade today."
+
+The generated prompt must be displayed in an editable text area.
+
+Provide separate buttons for:
+- Copy Daily Prompt
+- Restore Default Prompt
+- Copy Prompt With Today's Date
+
+Use the local date in Asia/Kolkata when generating the date-specific prompt.
+
+Do not claim that copying or generating a prompt retrieves market data. The user will paste it into their preferred AI tool separately.
+
+## 7. PLAYBOOK LIBRARY
+
+Create a dedicated Playbook page containing the following rules in readable, editable text.
+
+TITLE: DAILY NIFTY 50 ONE-TRADE PLAYBOOK
+
+MISSION:
+Identify at most one high-quality intraday setup from current Nifty 50 stocks. NO TRADE is a valid result. Never promise profitability.
+
+RULES:
+- Capital and risk budget come from user settings.
+- Maximum one new trade per day.
+- No averaging down, martingale, revenge trading, or widening stops.
+- Default to cash-equity intraday without leverage or F&O.
+- Require at least 2:1 planned reward-to-risk after reasonable estimated costs.
+- Check the NSE market calendar and verify current Nifty 50 constituents.
+- Use reliable and timestamped data.
+- At 8:45 AM IST, the plan is conditional. Do not claim today's opening range or regular-session VWAP already exists.
+- Define the opening range as 9:15–9:30 AM IST.
+- After the range forms, require a completed 5-minute candle breakout/breakdown and relevant VWAP, volume, and market/sector confirmation.
+- Prefer a retest that holds for a long or fails for a short.
+- Use a logical stop-loss and a technically justified target.
+- Do not chase late moves.
+- If the trigger is missing or the data is unverified, do not trade.
+- If a trade has already been taken that day, do not initiate another.
+- Verify broker rules, order quantities, charges, and intraday square-off requirements.
+
+OPTIONAL Z-SCORE:
+Use the latest 20 completed daily closes only when verified historical data is available. Calculate the arithmetic mean, population standard deviation, and Z-score correctly. An absolute Z-score of 2 or more is a screening flag, not an entry signal. Never invent indicators.
+
+NO-TRADE CONDITIONS:
+Unverified data, missing confirmation, insufficient reward-to-risk, unsuitable liquidity, abnormal spreads, trading halts/circuits, unacceptable event risk, invalid position sizing, or an already completed trade that day.
+
+OUTPUT:
+One status, market snapshot, one candidate at most, trade-plan table, mandatory execution checklist, invalidation rules, and one clear final instruction.
+
+LIMITATIONS:
+The playbook does not independently fetch live prices, place orders, or monitor the market. Verify all trade information in the broker platform.
+
+Allow the user to edit the playbook.
+
+Include buttons:
+- Copy Playbook
+- Restore Default Playbook
+
+The copied playbook must be plain text and suitable for pasting into any AI assistant.
+
+## 8. JOURNAL AND TRADE RECORDS
+
+Every saved trade must be persisted.
+
+Store at least these fields:
+
+- Unique trade ID
+- Trade date
+- Stock name and NSE symbol
+- Direction
+- Setup status
+- Entry trigger
+- Technical reasoning
+- Planned entry
+- Planned stop-loss
+- Planned target
+- Planned quantity
+- Planned capital deployed
+- Planned risk
+- Planned gross loss
+- Planned target profit
+- Estimated costs
+- Actual entry price
+- Actual exit price
+- Actual entry time
+- Actual exit time
+- Actual quantity
+- Actual total charges and taxes
+- Trade status: Open, Closed, Cancelled
+- Gross P&L
+- Net P&L
+- Rule adherence: Yes, No, or Not Recorded
+- Discipline rating
+- Notes and lessons
+- Created and updated timestamps
+
+Use a date input and time inputs for the trade date, entry time, and exit time.
+
+Use Asia/Kolkata as the trading timezone for display and date-specific logic.
+
+Allow me to:
+- Save a planned trade.
+- Edit an existing trade.
+- Record actual fills.
+- Close a trade.
+- Mark a trade as cancelled.
+- Add notes.
+- Delete a trade after confirmation.
+- Search and filter by date, stock, direction, and status.
+- View a detailed trade record.
+
+Never silently overwrite existing journal records.
+
+Before saving a second trade on the same date, warn that the one-trade-per-day rule may be violated. Allow an override only after explicit confirmation and retain an indication that the rule was broken.
+
+## 9. ACTUAL P&L CALCULATIONS
+
+Use actual entry, actual exit, actual quantity, and actual total costs.
+
+For a long trade:
+
+Gross P&L = (Actual exit − Actual entry) × Actual quantity.
+
+For a short trade:
+
+Gross P&L = (Actual entry − Actual exit) × Actual quantity.
+
+Net P&L = Gross P&L − Actual total costs.
+
+Use actual fills, not planned prices, for realized performance.
+
+An open trade must not be counted as a closed, realized trade in win rate or realized net P&L.
+
+Validate that a trade cannot be marked Closed without actual entry, exit, and quantity.
+
+Handle breakeven trades separately from wins and losses.
+
+Use consistent currency rounding for display while preserving sufficient precision for calculations.
+
+## 10. JOURNAL TABLE
+
+Create a clean table containing:
+
+- Date
+- Stock
+- Direction
+- Planned entry
+- Actual entry
+- Stop-loss
+- Target
+- Actual exit
+- Quantity
+- Entry time
+- Exit time
+- Status
+- Gross P&L
+- Costs
+- Net P&L
+- Rule adherence
+
+Allow sorting by date, net P&L, and stock.
+
+Provide date-range filters and a one-tap option to show the current month.
+
+Provide a useful empty state if there are no trades.
+
+## 11. NO-TRADE DAY TRACKER
+
+I want to measure discipline even on days when I correctly avoid trading.
+
+Allow recording:
+- Date
+- Reason for not trading
+- Optional notes
+
+Suggested reasons:
+- No confirmed setup
+- Market data not verified
+- Reward-to-risk insufficient
+- Market closed
+- Already took one trade
+- Unacceptable event risk
+- Other
+
+Do not count a no-trade day as a winning or losing trade.
+
+Prevent duplicate no-trade records for the same date unless the user explicitly edits the existing record.
+
+Allow exporting no-trade days separately.
+
+## 12. ANALYTICS PAGE
+
+Use actual journal data to create useful performance metrics.
+
+Required metrics:
+
+- Total trades
+- Closed trades
+- Winning trades
+- Losing trades
+- Breakeven trades
+- Win rate
+- Gross profit
+- Gross loss
+- Total costs
+- Net realized P&L
+- Average win
+- Average loss
+- Average net expectancy per closed trade
+- Profit factor
+- Maximum drawdown based on chronological realized net P&L
+- Rule-following percentage
+- Average holding time when actual times are available
+- Monthly net P&L
+- Performance by stock
+- Performance by direction
+- Performance by setup type if recorded
+
+Definitions:
+- Win rate = winning closed trades / all closed trades × 100, with breakeven trades included in the denominator.
+- Expectancy = total net realized P&L / number of closed trades.
+- Profit factor = gross winning P&L / absolute gross losing P&L, using consistently defined P&L before or after costs and clearly labeling the metric.
+- Rule-following percentage = closed trades marked "Yes" / all closed trades with a recorded Yes/No rule-adherence value × 100.
+- Maximum drawdown = largest peak-to-subsequent-trough decline in cumulative realized net P&L, calculated chronologically.
+
+Do not fabricate metrics when there is insufficient data. Show "Not enough data" or "—".
+
+Use lightweight charts only when they improve understanding. Include:
+- Cumulative net P&L over time.
+- Monthly net P&L.
+- Win/loss distribution.
+
+Avoid misleading axes and ensure charts work on mobile.
+
+Do not imply that past performance predicts future profits.
+
+## 13. CSV EXPORT AND JSON BACKUP
+
+Create an Export & Settings page.
+
+CSV export must include all trade records and their relevant fields so I can analyze them later in Excel or Google Sheets.
+
+Use a proper CSV encoder that:
+- Escapes commas and quotation marks.
+- Handles multiline notes.
+- Uses UTF-8 encoding.
+- Includes headers.
+- Exports actual and planned values separately.
+
+Include:
+- Export All Trades to CSV
+- Export Current Month to CSV
+- Export Selected Date Range to CSV
+- Export No-Trade Days to CSV
+- Download Full Backup as JSON
+- Import JSON Backup
+
+The JSON backup must include:
+- All trades
+- No-trade days
+- User settings
+- Custom AI prompt
+- Custom playbook
+- App preferences
+
+Validate imported data before replacing existing data.
+
+Always confirm before a destructive import or deletion.
+
+Never delete existing records silently.
+
+Use filenames containing the export date.
+
+Include a clear success/error message after every export or import action.
+
+## 14. PERSISTENCE AND PRIVACY
+
+Preferred implementation: HTML, CSS, and vanilla JavaScript, with localStorage or IndexedDB for persistence.
+
+For a simple personal app, use localStorage if practical. If the app becomes too complex or stores large datasets, IndexedDB is acceptable.
+
+Data must persist across page refreshes in the same browser.
+
+Do not transmit personal journal records to third-party servers.
+
+Do not require an account or backend for the initial version.
+
+Clearly explain:
+- Data is stored locally on the device/browser.
+- Browser storage may be lost if the user clears browser data.
+- Another phone or computer will not automatically have the same records.
+- Users should export backups regularly.
+- JSON import is available for restoring data.
+
+Clipboard operations must use the Clipboard API when available and provide a sensible fallback when permissions or browser security prevent it.
+
+Do not claim successful copying if the copy action fails.
+
+## 15. SETTINGS
+
+Allow the user to edit and persist:
+
+- Available capital
+- Planned risk budget
+- Minimum reward-to-risk
+- Maximum new trades per day
+- Timezone
+- Preferred instrument
+- AI prompt template
+- Playbook text
+
+Defaults:
+Capital = ₹50,000.
+Risk budget = ₹250.
+Minimum reward-to-risk = 2:1.
+Maximum new trades = 1.
+Timezone = Asia/Kolkata.
+
+Validate all numeric settings.
+
+Changes to defaults should affect future calculations and generated prompts without rewriting historical trade records.
+
+## 16. TECHNICAL REQUIREMENTS
+
+Preferred stack:
+- HTML5
+- CSS3
+- Vanilla JavaScript
+
+If the platform requires React or another framework, use it while preserving all requirements.
+
+For a standalone implementation:
+- Deliver one complete `index.html`.
+- Embed CSS and JavaScript in the file.
+- Do not require a build process.
+- Do not require a paid API.
+- Do not use external services for basic functionality.
+- Avoid unnecessary dependencies.
+
+For a multi-file implementation:
+- Provide a clear folder structure.
+- Include every required source file.
+- Provide exact run/deployment instructions.
+- Ensure all routes and interactions work.
+
+Code quality:
+- Use clear functions and meaningful variable names.
+- Separate calculations, persistence, rendering, and validation.
+- Handle invalid inputs and storage errors gracefully.
+- Prevent accidental duplicate form submissions.
+- Use safe DOM rendering and avoid injecting user notes as raw HTML.
+- Add accessible form labels.
+- Use a stable ID for each trade.
+- Preserve data when editing a record.
+- Ensure responsive design.
+- Include comments for important financial formulas.
+
+Do not add fake market data, fake AI results, dummy trade records, or fake charts that look like real performance.
+
+## 17. ACCEPTANCE TESTS — REQUIRED BEFORE DELIVERY
+
+Test these scenarios and fix any failures:
+
+1. Opening the app on a phone-sized viewport produces a usable layout.
+2. Refreshing the page preserves journal entries and settings.
+3. Long trade sizing works correctly.
+4. Short trade sizing works correctly.
+5. Invalid entry/stop/target ordering is rejected.
+6. Quantity is the lower of risk-based and capital-based quantity.
+7. Zero quantity triggers a clear warning.
+8. Costs reduce estimated net reward and are not double-counted.
+9. The one-trade-per-day warning works.
+10. A saved trade can be edited.
+11. Actual entry and exit times can be recorded.
+12. Closed long-trade P&L is calculated correctly.
+13. Closed short-trade P&L is calculated correctly.
+14. Actual charges are subtracted from gross P&L.
+15. Open trades are excluded from realized P&L and win-rate calculations.
+16. Breakeven trades are not counted as wins or losses.
+17. Win rate, expectancy, profit factor, and maximum drawdown are calculated correctly.
+18. A no-trade day can be saved and exported.
+19. Copy AI Prompt works.
+20. Copy Playbook works.
+21. Copy Trade Plan works.
+22. CSV export contains correct headers and properly escaped fields.
+23. JSON export and import preserve records and settings.
+24. Import and delete actions require confirmation.
+25. Empty states display correctly.
+26. No action falsely claims that a broker order was placed.
+27. No feature pretends to fetch live market prices without a real data source.
+28. All visible buttons perform the action their labels advertise.
+
+Use a small temporary test dataset for automated/manual verification if needed, but remove all test records before delivering the final app.
+
+## 18. FINAL DELIVERY
+
+Deliver the completed application, not just instructions.
+
+If supported, create a downloadable project or HTML file.
+
+If the tool supports hosting, provide deployment instructions and a preview.
+
+Explain:
+1. How to run the application.
+2. How to use it each morning.
+3. How to save and update trades.
+4. How to export monthly data.
+5. How to back up and restore records.
+6. What features require internet access.
+7. What is not supported, especially live market feeds and broker execution.
+
+Prioritize correctness of financial calculations, privacy, ease of use, and reliability over decorative complexity.
+
+Build the best practical version of One Trade that satisfies these requirements.
